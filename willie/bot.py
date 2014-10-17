@@ -765,6 +765,7 @@ class Willie(irc.Bot):
         else:
             nick_blocked = host_blocked = None
 
+        has_triggered = False
         list_of_blocked_functions = []
         for priority in ('high', 'medium', 'low'):
             items = self.commands[priority].items()
@@ -791,12 +792,22 @@ class Willie(irc.Bot):
                         continue
                     if self.limit(origin, func):
                         continue
-                    if func.thread:
+                    if func.thread: # Execute module commands in their own thread.
                         targs = (func, origin, wrapper, trigger)
                         t = threading.Thread(target=self.call, args=targs)
                         t.start()
-                    else:
+                        has_triggered = True
+                        
+                    else: # Execute commands which are not sandboxed.
                         self.call(func, origin, wrapper, trigger)
+                        has_triggered = True
+        
+        # Run our math parser if no other commands have triggered.
+        prefix = self.config.core.prefix
+        regex = re.compile(r'^%s(.*)$' % prefix)
+        if has_triggered == False and regex.match(text):
+            print("TODO: Math parser goes here.")
+
 
         if list_of_blocked_functions:
             if nick_blocked and host_blocked:
