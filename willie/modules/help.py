@@ -28,7 +28,7 @@ def setup(bot=None):
 def help(bot, trigger):
     """Shows a command's documentation, and possibly an example."""
     if not trigger.group(2):
-        bot.reply('Say .help <command> (for example .help c) to get help for a command, or .commands for a list of commands.')
+        bot.reply('Say !help <command> (for example !help c) to get help for a command, or !commands for a list of commands.')
     else:
         name = trigger.group(2)
         name = name.lower()
@@ -68,7 +68,7 @@ def commands(bot, trigger):
 @priority('low')
 def help2(bot, trigger):
     response = (
-        'Hi, I\'m a bot. Say ".commands" to me in private for a list ' +
+        'Hi, I\'m a bot. Say "!commands" to me in private for a list ' +
         'of my commands, or see http://willie.dftba.net for more ' +
         'general details. My owner is %s.'
     ) % bot.config.owner
