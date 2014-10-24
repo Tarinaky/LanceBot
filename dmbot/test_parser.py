@@ -83,4 +83,7 @@ class TestParser(TestCase):
         assert tree == (',', ('df', 1, 6), 1000)
         return
 
-
+    def test_brackets(self):
+        tree = parser.make_tree("(1+2)*2")
+        assert tree == ('*', ('+', 1, 2), 2)
+        return
