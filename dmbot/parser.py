@@ -15,9 +15,10 @@ Integer = <Digit+>:x -> x
 Decimal = (Integer:i '.' Integer:f -> float("%s.%s" % (i,f))) | (Integer:i -> int(i))
 SIForm = Decimal:a 'e' Decimal:b -> a * 10**b
 Number = SIForm | Decimal | ('-' SIForm:x -> -1*x) | ('-' Decimal:x -> -1*x)
+Letter = :x ?(x in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY') -> x
 
 
-Dice = (Integer:a 'd' Integer:b -> ('d', a, b)) | ('d' Integer:a -> ('d', 0, a))
+Dice = (Integer:a 'd' Integer:b <Letter*>:mod -> ('d'+mod, a, b)) | ('d' Integer:a <Letter*>:mod -> ('d'+mod, 0, a))
 Terminal = Dice | Number
 
 Multiplication = Terminal:a ws '*' ws Term:b -> ('*', a, b)
@@ -26,7 +27,8 @@ Term = Multiplication | Division | ('(' ws Expression:a ws ')' ws -> a) | Termin
 
 Addition = Term:a ws '+' ws Expression:b -> ('+', a, b)
 Subtraction = Term:a ws '-' ws Expression:b -> ('-', a, b)
-Expression = Addition | Subtraction | Term
+Expression = Series | Addition | Subtraction | Term
+Series = Expression:a ws ',' ws Expression:b -> (',', a, b)
 
 """, {})
 
