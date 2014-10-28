@@ -10,30 +10,40 @@ class TestParser(TestCase):
     def test_tree(self):
         tree = parser.make_tree("1")
         assert tree == 1, tree
+        result = parser.evaluate_tree(tree)
+        assert result == 1, result
         return
 
-    def test_dice_float(self):
+    def test_parser_float(self):
         tree = parser.make_tree("0.3")
         assert tree == 0.3, tree
-
+        result = parser.evaluate_tree(tree)
+        assert result == 0.3, result
         return
 
-    def test_dice_siform(self):
+    def test_parser_siform(self):
         tree = parser.make_tree("7e6")
         assert tree == 7e6, tree
+        result = parser.evaluate_tree(tree)
+        assert result == 7e6, result
         return
 
-    def test_dice_negative(self):
+    def test_parser_negative(self):
         tree = parser.make_tree("-7")
         assert tree == -7, tree
+        result = parser.evaluate_tree(tree)
+        assert result == -7, result
         return
 
-    def test_dice_d20(self):
+    def test_parser_d20(self):
         tree = parser.make_tree("d20")
         assert tree == ('d', 1, 20), tree
+        result = parser.evaluate_tree(tree)
+        assert result <= 20, result
+        assert result >= 1, result
         return
 
-    def test_dice_d6(self):
+    def test_parser_d6(self):
         tree = parser.make_tree("d6")
         assert tree == ('d', 1, 6), tree
         return

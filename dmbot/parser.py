@@ -7,6 +7,8 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 from parsley import *
+import random
+
 
 grammar = makeGrammar("""
 
@@ -34,8 +36,35 @@ Expression = Series | Subexpression
 
 """, {})
 
+def roll_dice(num, size):
+    return [ random.randint(1,size) for _ in range(num) ]
+
+
+def node_type(tree):
+    (a,_,_) = tree
+    return a
+
+
+def evaluate_dice(tree):
+    (_, left, right) = tree
+    left = evaluate_tree(left)
+    right = evaluate_tree(right)
+    dice = roll_dice(left, right)
+    return sum(dice)
+    
+eval_bindings = {
+        'd': evaluate_dice
+}
+        
+
 def make_tree(string):
     return grammar(string).Expression()
+
+def evaluate_tree(tree):
+    if isinstance(tree, int) or isinstance(tree, float):
+        return tree
+    if isinstance(tree, tuple):
+        return eval_bindings[node_type(tree)](tree)
 
 class Dice(object):
     def __init__(self, string):
