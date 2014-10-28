@@ -46,54 +46,90 @@ class TestParser(TestCase):
     def test_parser_d6(self):
         tree = parser.make_tree("d6")
         assert tree == ('d', 1, 6), tree
+        result = parser.evaluate_tree(tree)
+        assert result >= 1, result
+        assert result <= 6, result
         return
 
     def test_simple_math_add_mult(self):
         tree = parser.make_tree("3+1*2")
         assert tree == ('+', 3, ('*', 1, 2)), tree
+        result = parser.evaluate_tree(tree)
+        assert result == 5, result
         return
 
     def test_simple_math_sub_div(self):
         tree = parser.make_tree("2+6/3")
         assert tree == ('+', 2, ('/', 6, 3)), tree
+        result = parser.evaluate_tree(tree)
+        assert result == 4, result
         return
 
     def test_simple_math_mult_div(self):
         tree = parser.make_tree("10/2*5")
         assert tree == ('*', ('/', 10, 2), 5), tree
+        result = parser.evaluate_tree(tree)
+        assert result == 25, result
         return
 
     def test_modifier(self):
         tree = parser.make_tree("d10 + 12 - 2")
         assert tree == ('-', ('+', ('d', 1, 10), 12), 2), tree
+        result = parser.evaluate_tree(tree)
+        assert result >= 11, result
+        assert result <= 20, result
         return 
 
     def test_group(self):
         tree = parser.make_tree("3d6")
         assert tree == ('d', 3, 6), tree
+        result = parser.evaluate_tree(tree)
+        assert result >= 3, result
+        assert result <= 18, result
         return
 
     def test_series(self):
         tree = parser.make_tree("d6,6")
         assert tree == (',', ('d', 1, 6), 6), tree
+        series = parser.evaluate_tree(tree)
+        assert len(series) == 6, series
+        for result in series:
+            assert result >= 1, series
+            assert result <= 6, series
         return
 
     def test_series_modifier(self):
         tree = parser.make_tree("d6+2,6")
         assert tree == (',', ('+', ('d', 1,6),2),6), tree
+        series = parser.evaluate_tree(tree)
+        assert len(series) == 6, series
+        for result in series:
+            assert result >= 3, series
+            assert result <= 8, series
         return
 
     def test_dnd_chargen(self):
-        tree = parser.make_tree("4d6l,6")
-        assert tree == (',', ('dl', 4, 6), 6), tree
+        tree = parser.make_tree("4d6l,100")
+        assert tree == (',', ('dl', 4, 6), 100), tree
+        series = parser.evaluate_tree(tree)
+        assert len(series) == 100, series
+        for result in series:
+            assert result >= 3, series
+            assert result <= 18, series
         return
 
     def test_shadowrun(self):
         tree = parser.make_tree("d6f,1000")
         assert tree == (',', ('df', 1, 6), 1000)
+        series = parser.evaluate_tree(tree)
+        assert len(series) == 1000, series
+        for result in series:
+            assert (result % 6) != 0, (series, tree)
         return
 
     def test_brackets(self):
         tree = parser.make_tree("(1+2)*2")
         assert tree == ('*', ('+', 1, 2), 2)
+        result = parser.evaluate_tree(tree)
+        assert result == 6, result
         return

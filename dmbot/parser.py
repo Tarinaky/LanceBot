@@ -42,18 +42,72 @@ def roll_dice(num, size):
 
 def node_type(tree):
     (a,_,_) = tree
-    return a
+    return a[0]
+
+def floating_reroll(mutable, die_size):
+    if (mutable[0] % 6) == 0:
+        mutable[0] += roll_dice(1,die_size)[0]
+        floating_reroll(mutable, die_size)
+    return mutable
+        
 
 
 def evaluate_dice(tree):
-    (_, left, right) = tree
+    (mods, left, right) = tree
+    mods = mods.lower()
     left = evaluate_tree(left)
     right = evaluate_tree(right)
     dice = roll_dice(left, right)
+    drop_lowest = mods.count('l')
+    floating_rerolls = mods.count('f')
+    if floating_rerolls > 0:
+        for i in range(len(dice) ):
+            mutable = [ dice[i] ]
+            floating_reroll(mutable, right)
+            dice[i] = mutable[0]
+    if drop_lowest > 0:
+        dice = sorted(dice)
+        for _ in range(drop_lowest):
+            dice.pop(0)
     return sum(dice)
+
+def evaluate_add(tree):
+    (_, left, right) = tree
+    left = evaluate_tree(left)
+    right = evaluate_tree(right)
+    return left + right
+
+def evaluate_sub(tree):
+    (_, left, right) = tree
+    left = evaluate_tree(left)
+    right = evaluate_tree(right)
+    return left - right
+
+def evaluate_mult(tree):
+    (_, left, right) = tree
+    left = evaluate_tree(left)
+    right = evaluate_tree(right)
+    return left * right
+
+def evaluate_div(tree):
+    (_, left, right) = tree
+    left = evaluate_tree(left)
+    right = evaluate_tree(right)
+    return left / right
+
+def evaluate_series(tree):
+    (_, left, right) = tree
+    right = evaluate_tree(right)
+    return [ evaluate_tree(left) for _ in range(right) ]
+
     
 eval_bindings = {
-        'd': evaluate_dice
+        'd': evaluate_dice,
+        '+': evaluate_add,
+        '-': evaluate_sub,
+        '*': evaluate_mult,
+        '/': evaluate_div,
+        ',': evaluate_series
 }
         
 
