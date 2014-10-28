@@ -21,13 +21,14 @@ Letter = :x ?(x in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY') -> x
 Dice = (Integer:a 'd' Integer:b <Letter*>:mod -> ('d'+mod, a, b)) | ('d' Integer:a <Letter*>:mod -> ('d'+mod, 1, a))
 Terminal = Dice | Number
 
-Multiplication = Terminal:a ws '*' ws Term:b -> ('*', a, b)
-Division = Terminal:a ws '/' ws Term:b -> ('/', a, b)
-Term = Division | Multiplication | ('(' ws Expression:a ws ')' ws -> a) | Terminal
+Paren = ('(' ws Expression:a ws ')' ws -> a) | Terminal
 
-Addition = Term:a ws '+' ws Expression:b -> ('+', a, b)
-Subtraction = Term:a ws '-' ws Expression:b -> ('-', a, b)
-Subexpression = Series | Addition | Subtraction | Term
+Division = (Paren:a ws '/' ws Division:b -> ('/', a, b)) | Paren
+Multiplication = (Division:a ws '*' ws Multiplication:b -> ('*', a, b)) | Division
+
+Addition = (Multiplication:a ws '+' ws Addition:b -> ('+', a, b)) | Multiplication
+Subtraction = (Addition:a ws '-' ws Subtraction:b -> ('-', a, b)) | Addition
+Subexpression = Subtraction
 Series = Subexpression:a ws ',' ws Subexpression:b -> (',', a, b)
 Expression = Series | Subexpression
 
