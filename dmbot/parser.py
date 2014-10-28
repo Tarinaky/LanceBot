@@ -37,21 +37,41 @@ Expression = Series | Subexpression
 """, {})
 
 def roll_dice(num, size):
+    """
+    Roll a number of dice using Python's singleton random module.
+
+    num     --  The number of dice to roll
+    size    --  The number of sides on the dice, which will be assumed to be 
+                marked 1 through size.
+    """
     return [ random.randint(1,size) for _ in range(num) ]
 
 
 def node_type(tree):
+    """
+    Queries what type of AST node is at the head of the tree i.e. addition,
+    subtraction or multiplication. Each such type is represented by the first
+    character of a string: with any additional characters reserved for arguments
+    and flags to be used when resolving that node into a numerical type.
+
+    tree    --  A 3-tuple representing a binary tree node.
+    """
     (a,_,_) = tree
     return a[0]
 
 def floating_reroll(mutable, die_size):
-    if (mutable[0] % 6) == 0:
+    """
+    Recursively implements floating re-rolls or 'exploding' dice.
+
+    mutable     --  A list containing a single numerical value, used as a hack
+                    to allow mutability.
+    die_size    --  The size of the dice to rolled.
+    """
+    if (mutable[0] % die_size) == 0:
         mutable[0] += roll_dice(1,die_size)[0]
         floating_reroll(mutable, die_size)
     return mutable
         
-
-
 def evaluate_dice(tree):
     (mods, left, right) = tree
     mods = mods.lower()
