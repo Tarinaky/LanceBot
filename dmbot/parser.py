@@ -73,6 +73,14 @@ def floating_reroll(mutable, die_size):
     return mutable
         
 def evaluate_dice(tree):
+    """
+    Resolve a 3-tuple binary tree representing a dice-throw into a single
+    'throw' of the dice as a numerical value.
+
+    tree    --  3-tuple binary tree representing the dice-specification. Left
+                branch is the number of dice, right branch is the size of those
+                dice.
+    """
     (mods, left, right) = tree
     mods = mods.lower()
     left = evaluate_tree(left)
@@ -92,35 +100,69 @@ def evaluate_dice(tree):
     return sum(dice)
 
 def evaluate_add(tree):
+    """
+    Resolve a 3-tuple binary tree representation of an addition operation into
+    a numerical value representing the value.
+
+    tree    --  3-tuple binary tree representing the addition.
+    """
     (_, left, right) = tree
     left = evaluate_tree(left)
     right = evaluate_tree(right)
     return left + right
 
 def evaluate_sub(tree):
+    """
+    Resolve a 3-tuple binary tree represention of a subtraction operation into
+    a numerical value representing the value.
+
+    tree    -- 3-tuple binary tree representing the subtraction.
+    """
     (_, left, right) = tree
     left = evaluate_tree(left)
     right = evaluate_tree(right)
     return left - right
 
 def evaluate_mult(tree):
+    """
+    Resolve a 3-tuple binary tree representation of a multiplication operation
+    into a numerical value representing the value.
+
+    tree    --  3-tuple binary tree representing the multiplication.
+    """
     (_, left, right) = tree
     left = evaluate_tree(left)
     right = evaluate_tree(right)
     return left * right
 
 def evaluate_div(tree):
+    """
+    Resolve a 3-tuple binary tree representation of a division operation into a
+    numerical value representing the value.
+
+    tree    --  3-tuple binary tree representing the multiplication.
+    """
     (_, left, right) = tree
     left = evaluate_tree(left)
     right = evaluate_tree(right)
     return left / right
 
 def evaluate_series(tree):
+    """
+    Resolve a 3-tuple binary tree representation of a series, or repetition of
+    operations, into a python list representing the numerical values of each
+    evaluation of the left-head operation.
+
+    tree    --  3-tuple binary tree representing the series, left branch is the
+                statement to repeat, right branch is the number of repetitions.
+    """
     (_, left, right) = tree
     right = evaluate_tree(right)
     return [ evaluate_tree(left) for _ in range(right) ]
 
-    
+"""
+Dict for binding the node-type to the function used to resolve it numerically.
+"""
 eval_bindings = {
         'd': evaluate_dice,
         '+': evaluate_add,
@@ -132,21 +174,20 @@ eval_bindings = {
         
 
 def make_tree(string):
+    """
+    Construct a 3-tuple binary tree representing an AST from a string. Uses the
+    parsley grammar defined in global variable grammar.
+
+    string  --  The string to translate.
+    """
     return grammar(string).Expression()
 
 def evaluate_tree(tree):
+    """
+    Evaluate a 3-tuple binary tree represnting an AST into a numerical value.
+    """
     if isinstance(tree, int) or isinstance(tree, float):
         return tree
     if isinstance(tree, tuple):
         return eval_bindings[node_type(tree)](tree)
-
-class Dice(object):
-    def __init__(self, string):
-        make_tree
-
-
-    @property
-    def roll(self):
-        return self.tree
-
 
