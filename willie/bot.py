@@ -28,6 +28,10 @@ from willie.db import WillieDB
 from willie.tools import (stderr, Nick, PriorityQueue, released,
                           get_command_regexp, iteritems, itervalues)
 import willie.module as module
+
+from dmbot.dice import Dice
+from ometa.runtime import ParseError
+
 if sys.version_info.major >= 3:
     unicode = str
     basestring = str
@@ -804,9 +808,19 @@ class Willie(irc.Bot):
         
         # Run our math parser if no other commands have triggered.
         prefix = self.config.core.prefix
-        regex = re.compile(r'^%s(.*)$' % prefix)
+        regex = re.compile(r'^%s([^:]+)(?::\s*(.*))?$' % prefix)
         if has_triggered == False and regex.match(text):
-            print("TODO: Math parser goes here.")
+            try:
+                (expression, comment) = regex.match(text).groups()
+                if comment == None:
+                    comment = expression
+                dice = Dice(expression )
+                result = dice.roll
+                wrapper.reply("%s: %s" % (comment, result) )
+            except ParseError:
+                print("ERROR: Expression '%s' not an expression." % text)
+                wrapper.reply("Sorry, I cannot parse '%s'" % text)
+
 
 
         if list_of_blocked_functions:
