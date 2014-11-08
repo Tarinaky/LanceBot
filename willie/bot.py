@@ -807,21 +807,8 @@ class Willie(irc.Bot):
                         has_triggered = True
         
         # Run our math parser if no other commands have triggered.
-        prefix = self.config.core.prefix
-        regex = re.compile(r'^%s([^:]+)(?::\s*(.*))?$' % prefix)
-        if has_triggered == False and regex.match(text):
-            try:
-                (expression, comment) = regex.match(text).groups()
-                if comment == None:
-                    comment = expression
-                dice = Dice(expression )
-                result = dice.roll
-                wrapper.reply("%s: %s" % (comment, result) )
-            except ParseError:
-                print("ERROR: Expression '%s' not an expression." % text)
-                wrapper.reply("Sorry, I cannot parse '%s'" % text)
-
-
+        if has_triggered == False:
+            self._dmbot_call(wrapper, text)
 
         if list_of_blocked_functions:
             if nick_blocked and host_blocked:
@@ -839,6 +826,28 @@ class Willie(irc.Bot):
                 ),
                 "verbose"
             )
+
+    def _dmbot_call(self, wrapper, text):
+        """
+        Extract our dice expression from the trigger text and call DMBot module.
+
+        wrapper is a WillieWrapper object to use to reply to the trigger.
+        text    is the triggering text.
+        """
+        prefix = self.config.core.prefix
+        regex = re.compile(r'^%s([^:]+)(?::\s*(.*))?$' % prefix)
+        if regex.match(text):
+            try:
+                (expression, comment) = regex.match(text).groups()
+                if comment == None:
+                    comment = expression
+                dice = Dice(expression )
+                result = dice.roll
+                wrapper.reply("%s: %s" % (comment, result) )
+            except ParseError:
+                print("ERROR: Expression '%s' not an expression." % text)
+                wrapper.reply("Sorry, I cannot parse '%s'" % text)
+        return
 
     def _host_blocked(self, host):
         bad_masks = self.config.core.get_list('host_blocks')
