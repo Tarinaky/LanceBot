@@ -133,3 +133,9 @@ class TestParser(TestCase):
         result = parser.evaluate_tree(tree)
         assert result == 6, result
         return
+
+    def test_whitespace(self):
+        parser.make_tree("d6 ")
+        parser.make_tree("d6,6 ")
+        return
+        

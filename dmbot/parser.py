@@ -20,18 +20,18 @@ Number = SIForm | Decimal | ('-' SIForm:x -> -1*x) | ('-' Decimal:x -> -1*x)
 Letter = :x ?(x in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY') -> x
 
 
-Dice = (Integer:a 'd' Integer:b <Letter*>:mod -> ('d'+mod, a, b)) | ('d' Integer:a <Letter*>:mod -> ('d'+mod, 1, a))
+Dice = (Integer:a 'd' Integer:b <Letter*>:mod ws -> ('d'+mod, a, b)) | ('d' Integer:a <Letter*>:mod ws -> ('d'+mod, 1, a))
 Terminal = Dice | Number
 
 Paren = ('(' ws Expression:a ws ')' ws -> a) | Terminal
 
-Division = (Paren:a ws '/' ws Division:b -> ('/', a, b)) | Paren
-Multiplication = (Division:a ws '*' ws Multiplication:b -> ('*', a, b)) | Division
+Division = (Paren:a ws '/' ws Division:b ws -> ('/', a, b)) | Paren
+Multiplication = (Division:a ws '*' ws Multiplication:b ws -> ('*', a, b)) | Division
 
-Addition = (Multiplication:a ws '+' ws Addition:b -> ('+', a, b)) | Multiplication
-Subtraction = (Addition:a ws '-' ws Subtraction:b -> ('-', a, b)) | Addition
+Addition = (Multiplication:a ws '+' ws Addition:b ws -> ('+', a, b))  | Multiplication
+Subtraction = (Addition:a ws '-' ws Subtraction:b ws -> ('-', a, b)) | Addition
 Subexpression = Subtraction
-Series = Subexpression:a ws ',' ws Subexpression:b -> (',', a, b)
+Series = Subexpression:a ws ',' ws Subexpression:b ws -> (',', a, b)
 Expression = Series | Subexpression
 
 """, {})
