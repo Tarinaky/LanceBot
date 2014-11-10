@@ -9,7 +9,7 @@ import sys
 import os
 import shutil
 
-requires = ['feedparser', 'pytz', 'lxml', 'praw', 'enchant', 'pygeoip']
+requires = ['feedparser', 'pytz', 'lxml', 'praw', 'enchant', 'pygeoip', 'parsley']
 if sys.version_info.major < 3:
     requires.append('backports.ssl_match_hostname')
 

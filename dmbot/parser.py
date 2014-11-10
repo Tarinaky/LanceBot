@@ -2,6 +2,9 @@
 # coding=utf8
 """
 Implementation of DMBot style dice specification language and math parser.
+
+Copyright 2014, Emma Smith (Tarinaky)
+Licensed under the Eiffel Forum License 2.
 """
 from __future__ import unicode_literals
 from __future__ import print_function
@@ -28,7 +31,10 @@ Paren = ('(' ws Expression:a ws ')' ws -> a) | Terminal
 Division = (Paren:a ws '/' ws Division:b ws -> ('/', a, b)) | Paren
 Multiplication = (Division:a ws '*' ws Multiplication:b ws -> ('*', a, b)) | Division
 
-Addition = (Multiplication:a ws '+' ws Addition:b ws -> ('+', a, b))  | Multiplication
+LessThan = (Multiplication:a ws '<' ws LessThan:b ws -> ('<', a,b)) | Multiplication
+GreaterThan = (LessThan:a ws '>' ws GreaterThan:b ws -> ('>', a,b)) | LessThan
+
+Addition = (GreaterThan:a ws '+' ws Addition:b ws -> ('+', a, b))  | GreaterThan
 Subtraction = (Addition:a ws '-' ws Subtraction:b ws -> ('-', a, b)) | Addition
 Subexpression = Subtraction
 Series = Subexpression:a ws ',' ws Subexpression:b ws -> (',', a, b)
@@ -160,6 +166,30 @@ def evaluate_series(tree):
     right = evaluate_tree(right)
     return [ evaluate_tree(left) for _ in range(right) ]
 
+def evaluate_greaterthan(tree):
+    """
+    Resolve a 3-tuple binary tree representation of a boolean comparison into 
+    a true or false value represented as an integer: 1 or 0.
+
+    tree    -- 3-tuple binary tree representing the comparison.
+    """
+    (_, left, right) = tree
+    left = evaluate_tree(left)
+    right = evaluate_tree(right)
+    return 1 if left > right else 0
+
+def evaluate_lessthan(tree):
+    """
+    Resolve a 3-tuple binary tree representation of a boolean comparison into
+    a true or false value represented as an integer: 1 or 0.
+    
+    tree    -- 3-tuple binary tree representing the comparison.
+    """
+    (_, left, right) = tree
+    left = evaluate_tree(left)
+    right = evaluate_tree(right)
+    return 1 if left < right else 0
+
 """
 Dict for binding the node-type to the function used to resolve it numerically.
 """
@@ -169,7 +199,9 @@ eval_bindings = {
         '-': evaluate_sub,
         '*': evaluate_mult,
         '/': evaluate_div,
-        ',': evaluate_series
+        ',': evaluate_series,
+        '<': evaluate_lessthan,
+        '>': evaluate_greaterthan
 }
         
 

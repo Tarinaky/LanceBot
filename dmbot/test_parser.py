@@ -1,6 +1,11 @@
 #!/usr/bin/env python2.7
 # coding=utf8
+"""
+Unit tests for the parser module.
 
+Copyright 2014, Emma Smith (Tarinaky)
+Licensed under the Eiffel Forum License 2.
+"""
 import parser
 
 from unittest import TestCase
@@ -139,3 +144,28 @@ class TestParser(TestCase):
         parser.make_tree("d6,6 ")
         return
         
+    def test_lessthan(self):
+        tree = parser.make_tree("1<2")
+        assert tree == ('<', 1, 2)
+        result = parser.evaluate_tree(tree)
+        assert result == 1
+        tree = parser.make_tree("2<1")
+        assert tree == ('<', 2, 1)
+        result = parser.evaluate_tree(tree)
+        assert result == 0
+        return
+
+    def test_greaterthan(self):
+        tree = parser.make_tree("1>2")
+        assert tree == ('>', 1, 2)
+        result = parser.evaluate_tree(tree)
+        assert result == 0
+        tree = parser.make_tree("2>1")
+        assert tree == ('>', 2, 1)
+        result = parser.evaluate_tree(tree)
+        assert result == 1
+        return
+
+
+    
+
