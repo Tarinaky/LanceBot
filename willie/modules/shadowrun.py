@@ -13,6 +13,8 @@ from __future__ import unicode_literals
 from willie.module import commands, rule, example, priority
 from willie.tools import iterkeys
 
+import re
+
 from dmbot.dice import Dice
 
 def count_successes(dice, tn):
@@ -28,11 +30,23 @@ def find_largest(dice):
 @commands('sr')
 @example(r'!sr <dice> [<target number> [<repeats>]]')
 def sr3_dice_roll(bot, trigger):
-    dice = trigger.group(3)
-    tn = trigger.group(4)
-    repeats = trigger.group(5)
-    calculate_sux = True
+    """
+    Shadowrun Third Edition Dice roller, supporting hidden Target Numbers 
+    (1 argument supplied), open Target Numbers (two arguments supplied) and batch
+    rolling (three arguments supplied).
+    """
 
+    trigger = re.search(r'(\d+)(?: +(\d+)(?: +(\d+))?)?(?: *:(.*))?', trigger)
+
+    dice = trigger.group(1)
+    tn = trigger.group(2)
+    repeats = trigger.group(3)
+    comment = trigger.group(4)
+    calculate_sux = True
+    display_comment = "'%s' " % comment
+
+    if comment is None:
+        display_comment = ""
     if tn is None:
         calculate_sux = False
         tn = 4
@@ -47,11 +61,11 @@ def sr3_dice_roll(bot, trigger):
     open_test = [ find_largest(dice) for dice in results ]
         
     if repeats > 1:
-        bot.reply("Open Tests: %s; Success Tests: %s" % (str(open_test), str(successes) ) )
+        bot.reply("%sOpen Tests: %s or Success Tests: %s" % (display_comment, str(open_test), str(successes) ) )
     elif calculate_sux:
-        bot.reply("%s = %s sux" % (str(results[0]), str(successes[0]) ) )
+        bot.reply("%s%s = %s sux" % (display_comment, str(results[0]), str(successes[0]) ) )
     else:
-        bot.reply(str(results[0]))
+        bot.reply("%s%s"%(display_comment, str(results[0]) ) )
 
 
 
