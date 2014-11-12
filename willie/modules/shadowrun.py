@@ -36,7 +36,7 @@ def sr3_dice_roll(bot, trigger):
     rolling (three arguments supplied).
     """
 
-    trigger = re.search(r'(\d+)(?: +(\d+)(?: +(\d+))?)?(?: *:(.*))?', trigger)
+    trigger = re.search(r'(\d+)(?: +(\d+)(?: +(\d+))?)?(?: *:\s*(\S.*)?)?', trigger)
 
     dice = trigger.group(1)
     tn = trigger.group(2)
