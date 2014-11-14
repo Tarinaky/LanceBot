@@ -52,6 +52,11 @@ def sr3_dice_roll(bot, trigger):
         tn = 4
     else:
         tn = int(tn)
+
+    # Rule of Ones (minimum TN2)
+    if tn < 2:
+        tn = 2
+
     if repeats is None:
         repeats = 1
     else:
@@ -59,9 +64,16 @@ def sr3_dice_roll(bot, trigger):
     results = [ Dice("d6f,%s" % (dice) ).roll for _ in range(repeats) ]
     successes = [ count_successes(dice, tn) for dice in results ]
     open_test = [ find_largest(dice) for dice in results ]
-        
+
     if repeats > 1:
-        bot.reply("%sOpen Tests: %s or Success Tests: %s" % (display_comment, str(open_test), str(successes) ) )
+        # Rule of Ones: Fumbles
+        for i in range( len( successes) ):
+            if open_test[i] == 1:
+                successes[i] = b"~Fumble~"
+        successes = [ str(a).strip("'") for a in successes ]
+        successes = ", ".join(successes)
+        
+        bot.reply("%sOpen Tests (Highest die): %s or Success Tests (TN%s): [%s]" % (display_comment, str(open_test), str(tn), successes.strip("'") ) )
     elif calculate_sux:
         bot.reply("%s%s = %s sux" % (display_comment, str(results[0]), str(successes[0]) ) )
     else:

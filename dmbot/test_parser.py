@@ -166,6 +166,10 @@ class TestParser(TestCase):
         assert result == 1
         return
 
-
-    
+    def test_fraction(self):
+        tree = parser.make_tree("1/2")
+        assert tree == ('/', 1, 2), tree
+        result = parser.evaluate_tree(tree)
+        assert result == 0.5, result
+        return
 
